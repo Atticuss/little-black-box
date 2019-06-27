@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloudflared-deployment
+  labels:
+    app: cloudflared
+spec:
+  selector:
+    matchLabels:
+      app: cloudflared
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: cloudflared
+    spec:
+      containers:
+      - name: cloudflared
+        image: docker.io/visibilityspots/cloudflared:arm64
+        ports:
+        - containerPort: 5054
+          name: cloudflared-dns
+          protocol: UDP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cloudflared-service
+  labels:
+    app: cloudflared
+spec:
+  selector:
+    app: cloudflared
+  ports:
+  - name: cloudflared-dns
+    protocol: UDP
+    port: 5054
+    targetPort: 5054

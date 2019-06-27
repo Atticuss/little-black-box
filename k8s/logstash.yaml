@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: logstash-deployment
+  labels:
+    app: logstash
+spec:
+  selector:
+    matchLabels:
+      app: logstash
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: logstash
+    spec:
+      volumes:
+      - name: logstash-config
+        configMap:
+          name: logstash-configmap
+          items:
+          - key: pipeline.conf
+            path: pipeline.conf
+      - name: logstash-patterns
+        configMap:
+          name: logstash-configmap
+          items:
+          - key: dnsmasq
+            path: dnsmasq
+      containers:
+      - name: logstash
+        image: docker.io/atticuss/logstash:6.6-aarch64
+        volumeMounts:
+        - mountPath: /usr/share/logstash/pipeline.conf
+          subPath: pipeline.conf
+          name: logstash-config
+        - mountPath: /usr/share/logstash/patterns/dnsmasq
+          subPath: dnsmasq
+          name: logstash-patterns
+        ports:
+        - containerPort: 5044
+          name: logstash-ingest
+          protocol: TCP
+        - containerPort: 9600
+          name: logstash-api
+          protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: logstash-discovery
+  labels:
+    app: logstash
+spec:
+  selector:
+    app: logstash
+  ports:
+  - name: logstash-ingestion
+    port: 5044
+    protocol: TCP
+  - name: logstash-api
+    port: 9600
+    protocol: TCP
