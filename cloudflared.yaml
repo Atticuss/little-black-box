@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: cloudflared-deployment
+  namespace: secure-dns
   labels:
     app: cloudflared
 spec:
@@ -16,7 +17,7 @@ spec:
     spec:
       containers:
       - name: cloudflared
-        image: docker.io/visibilityspots/cloudflared:arm64
+        image: docker.io/visibilityspots/cloudflared:latest
         ports:
         - containerPort: 5054
           name: cloudflared-dns
@@ -26,13 +27,20 @@ apiVersion: v1
 kind: Service
 metadata:
   name: cloudflared-service
+  namespace: secure-dns
   labels:
     app: cloudflared
+  annotations:
+    metallb.universe.tf/address-pool: external-ip-pool
 spec:
   selector:
     app: cloudflared
+  type: LoadBalancer
+  externalTrafficPolicy: Cluster
+  clusterIP: 10.3.238.235
+  loadBalancerIP: 192.168.1.21
   ports:
   - name: cloudflared-dns
     protocol: UDP
-    port: 5054
+    port: 53
     targetPort: 5054
