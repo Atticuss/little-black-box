@@ -1,0 +1,160 @@
+# consider implementing:
+# https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#examples
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: plex-deployment
+  namespace: plex
+  labels:
+    app: plex
+spec:
+  selector:
+    matchLabels:
+      app: plex
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: plex
+    spec:
+      tolerations:
+        - key: "compute"
+          operator: "Equal"
+          value: "high"
+          effect: "NoSchedule"
+      volumes:
+      - name: plex-data
+        hostPath:
+          path: /mnt/zfs-nas/cluster/plex/data
+          type: Directory
+      - name: plex-config
+        hostPath:
+          path: /mnt/zfs-nas/cluster/plex/config
+          type: Directory
+      - name: plex-transcode
+        hostPath:
+          path: /mnt/zfs-nas/cluster/plex/transcode
+          type: Directory
+      #initContainers:
+      #  - name: change-data-dir-ownership
+      #    image: alpine:3
+      #    # Give `abc` user (ID 911) access to the /data dir. the 
+      #    # linuxserver ignores setting user/group/fs IDs via the
+      #    # `securityContext` 
+      #    command:
+      #    - chown
+      #    - -R
+      #    - 911:911
+      #    - /data
+      containers:
+      - name: plex
+        image: docker.io/linuxserver/plex:latest
+        # image: docker.io/linuxserver/plex:arm64v8-latest
+        resources:
+          requests:
+            memory: "8Gi"
+            cpu: "2"
+          limits:
+            memory: "32Gi"
+            cpu: "12"
+        env:
+        #- name: TZ
+        #  value: "America/New_York"
+        #- name: PLEX_CLAIM
+        #  value: claim-xzqWmycGUvXhqFvpm4BZ
+        #- name: ADVERTISE_IP
+        #  value: "http://192.168.1.81:32400"
+        - name: VERSION
+          value: "docker"
+        # yep. running as root. this should probably be fixed
+        # at some point down the line.
+        - name: PUID
+          value: "0"
+        - name: PGID
+          value: "0"
+        volumeMounts:
+        - mountPath: /data
+          name: plex-data
+        - mountPath: /config
+          name: plex-config
+        - mountPath: /transcode
+          name: plex-transcode
+        ports:
+        - containerPort: 32400
+          name: plex
+          protocol: UDP
+        - containerPort: 32400
+          name: plex-http
+          protocol: TCP
+        - containerPort: 32469
+          name: plex-dlna-tcp
+          protocol: TCP
+        - containerPort: 32469
+          name: plex-dlna-udp
+          protocol: UDP
+        - containerPort: 5353
+          name: plex-discovery
+          protocol: UDP
+        - containerPort: 1900
+          name: plex-dlna-2-udp
+          protocol: UDP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: plex
+  namespace: plex
+  labels:
+    app: plex
+  annotations:
+    metallb.universe.tf/address-pool: external-ip-pool
+    metallb.universe.tf/allow-shared-ip: plex-svc
+spec:
+  selector:
+    app: plex
+  type: LoadBalancer
+  externalTrafficPolicy: Cluster
+  loadBalancerIP: 192.168.1.22
+  ports:
+  - name: plex-http
+    protocol: TCP
+    port: 32400
+    targetPort: 32400
+  - name: plex-dlna-tcp
+    protocol: TCP
+    port: 32469
+    targetPort: 32469
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: plex-udp
+  namespace: plex
+  labels:
+    app: plex
+  annotations:
+    metallb.universe.tf/address-pool: external-ip-pool
+    metallb.universe.tf/allow-shared-ip: plex-svc
+spec:
+  selector:
+    app: plex
+  type: LoadBalancer
+  externalTrafficPolicy: Cluster
+  loadBalancerIP: 192.168.1.22
+  ports:
+  - name: plex
+    protocol: UDP
+    port: 32400
+    targetPort: 32400
+  - name: plex-dlna-udp
+    protocol: UDP
+    port: 32469
+    targetPort: 32469
+  - name: plex-discovery
+    protocol: UDP
+    port: 5353
+    targetPort: 5353
+  - name: plex-dlna-2-udp
+    protocol: UDP
+    port: 1900
+    targetPort: 1900
