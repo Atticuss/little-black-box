@@ -17,11 +17,8 @@ spec:
       labels:
         app: plex
     spec:
-      tolerations:
-        - key: "compute"
-          operator: "Equal"
-          value: "high"
-          effect: "NoSchedule"
+      nodeSelector:
+        compute: high
       volumes:
       - name: plex-data
         hostPath:
