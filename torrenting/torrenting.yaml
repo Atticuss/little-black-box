@@ -1,0 +1,213 @@
+# consider implementing:
+# https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#examples
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: torrenting-deployment
+  labels:
+    app: torrenting
+spec:
+  selector:
+    matchLabels:
+      app: torrenting
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: torrenting
+    spec:
+      nodeSelector:
+        compute: low
+      volumes:
+        - name: dev-net-tun
+          hostPath:
+            path: /dev/net/tun
+            type: File
+        - name: transcode-targets
+          hostPath:
+            path: /mnt/zfs-nas/cluster/transcode
+            type: Directory
+        - name: deluge-downloads
+          hostPath:
+            path: /mnt/zfs-nas/cluster/deluge/downloads
+            type: Directory
+        - name: deluge-config
+          hostPath:
+            path: /mnt/zfs-nas/cluster/deluge/config
+            type: Directory
+        - name: plex-data
+          hostPath:
+            path: /mnt/zfs-nas/cluster/plex/data
+            type: Directory
+        - name: radarr-config
+          hostPath:
+            path: /mnt/zfs-nas/cluster/radarr/config
+            type: Directory
+        - name: radarr-movies
+          hostPath:
+            path: /mnt/zfs-nas/cluster/radarr/movies
+            type: Directory
+        - name: sonarr-config
+          hostPath:
+            path: /mnt/zfs-nas/cluster/sonarr/config
+            type: Directory
+        - name: sonarr-tvshows
+          hostPath:
+            path: /mnt/zfs-nas/cluster/sonarr/tvshows
+            type: Directory
+        - name: jackett-config
+          hostPath:
+            path: /mnt/zfs-nas/cluster/jackett/config
+            type: Directory
+        - name: jackett-downloads
+          hostPath:
+            path: /mnt/zfs-nas/cluster/jackett/downloads
+            type: Directory
+      containers:
+        - name: nord
+          image: docker.io/bubuntux/nordvpn:3.6.1-1
+          #image: docker.io/bubuntux/nordvpn:3.7.1
+          #image: docker.io/bubuntux/nordvpn:3.8.5
+          imagePullPolicy: Always
+          securityContext:
+            capabilities:
+              add: ["NET_ADMIN"]
+          resources:
+            limits:
+              cpu: "1000m"
+              memory: "1G"
+          env:
+            - name: TZ
+              value: "America/New_York"
+            - name: USER
+              value: "jonn.callahan@gmail.com"
+            - name: PASS
+              value: "UW3Obk&o5v/SbjtK/QsN"
+            #- name: COUNTRY
+            #  value: "US"
+            - name: CATEGORY
+              value: "P2P"
+            - name: NETWORK
+              value: "192.168.1.0/24"
+            - name: TECHNOLOGY
+              value: "NordLynx"
+          #- name: OPENVPN_OPTS
+          #  value: "--pull-filter ignore \"ping-restart\" --ping-exit 180"
+          #volumeMounts:
+          #  - mountPath: /dev/net/tun
+          #    name: dev-net-tun
+        - name: deluge
+          image: docker.io/linuxserver/deluge:arm64v8-latest
+          imagePullPolicy: Always
+          env:
+            - name: TZ
+              value: "America/New_York"
+            - name: PUID
+              value: "0"
+            - name: PGID
+              value: "0"
+          #- name: DELUGE_LOGLEVEL
+          #  value: "debug"
+          volumeMounts:
+            - mountPath: /downloads/incomplete
+              name: deluge-downloads
+            - mountPath: /config
+              name: deluge-config
+            - mountPath: /downloads/plex
+              name: plex-data
+          ports:
+            - containerPort: 8112
+              name: deluge-http
+              protocol: TCP
+        - name: radarr
+          image: docker.io/linuxserver/radarr:arm64v8-latest
+          imagePullPolicy: Always
+          env:
+            - name: TZ
+              value: "America/New_York"
+          volumeMounts:
+            - mountPath: /downloads
+              name: deluge-downloads
+            - mountPath: /config
+              name: radarr-config
+            - mountPath: /movies
+              name: radarr-movies
+          ports:
+            - containerPort: 7878
+              name: radarr-http
+              protocol: TCP
+        - name: sonarr
+          image: docker.io/linuxserver/sonarr:arm64v8-latest
+          imagePullPolicy: Always
+          env:
+            - name: TZ
+              value: "America/New_York"
+          volumeMounts:
+            - mountPath: /downloads
+              name: deluge-downloads
+            - mountPath: /config
+              name: sonarr-config
+            - mountPath: /tv
+              name: sonarr-tvshows
+          ports:
+            - containerPort: 8989
+              name: sonarr-http
+              protocol: TCP
+        - name: jackett
+          image: docker.io/linuxserver/jackett:arm64v8-latest
+          imagePullPolicy: Always
+          env:
+            - name: TZ
+              value: "America/New_York"
+          volumeMounts:
+            - mountPath: /config
+              name: jackett-config
+            - mountPath: /downloads
+              name: jackett-downloads
+          ports:
+            - containerPort: 9117
+              name: jackett-http
+              protocol: TCP
+      restartPolicy: Always
+      dnsPolicy: None
+      dnsConfig:
+        nameservers:
+          - 1.1.1.1
+          - 8.8.8.8
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: torrenting-svc
+  labels:
+    app: torrenting
+  annotations:
+    metallb.universe.tf/address-pool: external-ip-pool
+    metallb.universe.tf/allow-shared-ip: torrenting-svc
+spec:
+  selector:
+    app: torrenting
+  type: LoadBalancer
+  externalTrafficPolicy: Local
+  loadBalancerIP: 192.168.1.24
+  ports:
+    - name: deluge-http
+      protocol: TCP
+      port: 8112
+      targetPort: 8112
+    - name: radarr-http
+      protocol: TCP
+      port: 7878
+      targetPort: 7878
+    - name: sonarr-http
+      protocol: TCP
+      port: 8989
+      targetPort: 8989
+    - name: jackett-http
+      protocol: TCP
+      port: 9117
+      targetPort: 9117
+    - name: transcoder-http
+      protocol: TCP
+      port: 5000
+      targetPort: 5000
