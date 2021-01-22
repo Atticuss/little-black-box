@@ -82,7 +82,7 @@ spec:
             - name: USER
               value: "jonn.callahan@gmail.com"
             - name: PASS
-              value: "UW3Obk&o5v/SbjtK/QsN"
+              value: "replaceme"
             #- name: COUNTRY
             #  value: "US"
             - name: CATEGORY
