@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: clustershell
+  namespace: vault-injector
+  labels:
+    app: clustershell
+  annotations:
+    vault.security.banzaicloud.io/vault-addr: "http://192.168.1.111:8200"
+    vault.security.banzaicloud.io/vault-role: "vault-injector"
+    vault.security.banzaicloud.io/vault-skip-verify: "true"
+    vault.security.banzaicloud.io/vault-path: "kubernetes"
+spec:
+  serviceAccountName: vswh-vault-secrets-webhook
+  automountServiceAccountToken: true
+  containers:
+  - name: clustershell
+    image: ubuntu:latest
+    command: ["sh", "-c", "echo $API_KEY && echo going to sleep... && sleep 10000"]
+    imagePullPolicy: IfNotPresent
+    env:
+      - name: API_KEY
+        value: vault:kv/data/dgraph#API_KEY
