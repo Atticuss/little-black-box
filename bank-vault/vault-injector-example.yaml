@@ -1,17 +1,17 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: clustershell
+  name: vault-example
   namespace: vault-injector
   labels:
-    app: clustershell
+    app: vault-example
   annotations:
     vault.security.banzaicloud.io/vault-addr: "http://192.168.1.111:8200"
     vault.security.banzaicloud.io/vault-role: "vault-injector"
     vault.security.banzaicloud.io/vault-skip-verify: "true"
     vault.security.banzaicloud.io/vault-path: "kubernetes"
 spec:
-  serviceAccountName: vswh-vault-secrets-webhook
+  serviceAccountName: default
   automountServiceAccountToken: true
   containers:
   - name: clustershell
