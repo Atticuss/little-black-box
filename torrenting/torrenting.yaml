@@ -74,7 +74,6 @@ spec:
       containers:
         - name: nord
           image: docker.io/bubuntux/nordvpn:latest
-          #image: docker.io/atticuss/nord-test:latest
           #imagePullPolicy: Always
           # this is required in order for the vault injector to properly
           # load secrets into the env vars
