@@ -1,23 +1,34 @@
-apiVersion: v1
-kind: Pod
+# consider implementing:
+# https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#examples
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: vault-example
+  name: vault-example-deployment
   namespace: vault-injector
   labels:
     app: vault-example
-  annotations:
-    vault.security.banzaicloud.io/vault-addr: "http://192.168.1.111:8200"
-    vault.security.banzaicloud.io/vault-role: "vault-injector"
-    vault.security.banzaicloud.io/vault-skip-verify: "true"
-    vault.security.banzaicloud.io/vault-path: "kubernetes"
 spec:
-  serviceAccountName: default
-  automountServiceAccountToken: true
-  containers:
-  - name: clustershell
-    image: ubuntu:latest
-    command: ["sh", "-c", "echo $API_KEY && echo going to sleep... && sleep 10000"]
-    imagePullPolicy: IfNotPresent
-    env:
-      - name: API_KEY
-        value: vault:kv/data/dgraph#API_KEY
+  selector:
+    matchLabels:
+      app: vault-example
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: vault-example
+      annotations:
+        vault.security.banzaicloud.io/vault-addr: "http://192.168.1.111:8200"
+        vault.security.banzaicloud.io/vault-role: "vault-injector"
+        vault.security.banzaicloud.io/vault-skip-verify: "true"
+        vault.security.banzaicloud.io/vault-path: "kubernetes"
+    spec:
+      serviceAccountName: default
+      automountServiceAccountToken: true
+      containers:
+        - name: vault-example
+          image: ubuntu:latest
+          command: ["sh", "-c", "echo $API_KEY && echo going to sleep... && sleep 10000"]
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: API_KEY
+              value: vault:kv/data/nord#USERNAME
