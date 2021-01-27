@@ -4,6 +4,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: torrenting-deployment
+  namespace: torrenting
   labels:
     app: torrenting
 spec:
@@ -15,14 +16,21 @@ spec:
     metadata:
       labels:
         app: torrenting
+      annotations:
+        vault.security.banzaicloud.io/vault-addr: "http://192.168.1.111:8200"
+        vault.security.banzaicloud.io/vault-role: "vault-injector"
+        vault.security.banzaicloud.io/vault-skip-verify: "true"
+        vault.security.banzaicloud.io/vault-path: "kubernetes"
     spec:
+      serviceAccountName: default
+      automountServiceAccountToken: true
       nodeSelector:
         compute: low
       volumes:
         - name: dev-net-tun
           hostPath:
             path: /dev/net/tun
-            type: File
+            type: CharDevice
         - name: transcode-targets
           hostPath:
             path: /mnt/zfs-nas/cluster/transcode
@@ -65,10 +73,12 @@ spec:
             type: Directory
       containers:
         - name: nord
-          image: docker.io/bubuntux/nordvpn:3.6.1-1
-          #image: docker.io/bubuntux/nordvpn:3.7.1
-          #image: docker.io/bubuntux/nordvpn:3.8.5
-          imagePullPolicy: Always
+          image: docker.io/bubuntux/nordvpn:latest
+          #image: docker.io/atticuss/nord-test:latest
+          #imagePullPolicy: Always
+          # this is required in order for the vault injector to properly
+          # load secrets into the env vars
+          command: ["sh", "-c", "/usr/bin/start_vpn.sh"]
           securityContext:
             capabilities:
               add: ["NET_ADMIN"]
@@ -80,9 +90,9 @@ spec:
             - name: TZ
               value: "America/New_York"
             - name: USER
-              value: "jonn.callahan@gmail.com"
+              value: vault:kv/data/nord#USERNAME
             - name: PASS
-              value: "replaceme"
+              value: vault:kv/data/nord#PASSWORD
             #- name: COUNTRY
             #  value: "US"
             - name: CATEGORY
@@ -93,12 +103,12 @@ spec:
               value: "NordLynx"
           #- name: OPENVPN_OPTS
           #  value: "--pull-filter ignore \"ping-restart\" --ping-exit 180"
-          #volumeMounts:
-          #  - mountPath: /dev/net/tun
-          #    name: dev-net-tun
+          volumeMounts:
+            - mountPath: /dev/net/tun
+              name: dev-net-tun
         - name: deluge
           image: docker.io/linuxserver/deluge:arm64v8-latest
-          imagePullPolicy: Always
+          #imagePullPolicy: Always
           env:
             - name: TZ
               value: "America/New_York"
@@ -121,7 +131,7 @@ spec:
               protocol: TCP
         - name: radarr
           image: docker.io/linuxserver/radarr:arm64v8-latest
-          imagePullPolicy: Always
+          #imagePullPolicy: Always
           env:
             - name: TZ
               value: "America/New_York"
@@ -138,7 +148,7 @@ spec:
               protocol: TCP
         - name: sonarr
           image: docker.io/linuxserver/sonarr:arm64v8-latest
-          imagePullPolicy: Always
+          #imagePullPolicy: Always
           env:
             - name: TZ
               value: "America/New_York"
@@ -155,7 +165,7 @@ spec:
               protocol: TCP
         - name: jackett
           image: docker.io/linuxserver/jackett:arm64v8-latest
-          imagePullPolicy: Always
+          #imagePullPolicy: Always
           env:
             - name: TZ
               value: "America/New_York"
