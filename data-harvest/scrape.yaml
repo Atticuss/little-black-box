@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scrape
+  labels:
+    app: scrape
+spec:
+  selector:
+    matchLabels:
+      app: scrape
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: scrape
+    spec:
+      volumes:
+      - name: cb-data
+        hostPath:
+          path: /mnt/gfs/cluster/exchange_data/coinbase
+          type: Directory
+      - name: reddit-data
+        hostPath:
+          path: /mnt/gfs/cluster/sentiment_data/reddit
+          type: Directory
+      containers:
+      - name: ex-scrape
+        image: docker.io/atticuss/exchange_scrape:coinbase
+        imagePullPolicy: Always
+        tty: True # required to reliably get print() statements from "kubectl logs"
+        env:
+        - name: PYTHONUNBUFFERED
+          value: "0"
+        - name: API_PASS
+          value: i89toudsxmo
+        - name: API_SECRET
+          value: Ml9o0eL/eHJnPXrUqb4WYMUAFQB3+oSqxEqU6nDTeOPPJpM5g55Hg2z1C5feVCr4yNaIT0pmnftCFaI3My390A==
+        - name: API_KEY
+          value: ec2fe85c6c2d936e31f4636d94d9e285
+        volumeMounts:
+        - mountPath: /data
+          name: cb-data
+      - name: sent-scrape
+        image: docker.io/atticuss/sentiment_scrape:reddit
+        imagePullPolicy: Always
+        tty: True # required to reliably get print() statements from "kubectl logs"
+        env:
+        - name: PYTHONUNBUFFERED
+          value: "0"
+        volumeMounts:
+        - mountPath: /data
+          name: reddit-data
+      dnsPolicy: None
+      dnsConfig:
+        nameservers:
+          - 192.168.1.80
+          - 192.168.1.1

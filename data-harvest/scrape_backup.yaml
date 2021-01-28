@@ -1,0 +1,50 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: scrape-backup
+  labels:
+    app: scrape-backup
+  namespace: data-harvest
+spec:
+  schedule: "0 22 * * *"
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: scrape-backup
+        spec:
+          restartPolicy: OnFailure
+          volumes:
+            - name: ex-data
+              hostPath:
+                path: /mnt/gfs/cluster/exchange_data/
+                type: Directory
+            - name: sent-data
+              hostPath:
+                path: /mnt/gfs/cluster/sentiment_data/
+                type: Directory
+          containers:
+            - name: ex-backup
+              image: atticuss/exchange_backup
+              imagePullPolicy: Always
+              tty: True # required to reliably get print() statements from "kubectl logs"
+              env:
+                - name: PYTHONUNBUFFERED
+                  value: "0"
+                - name: BUCKET_NAME
+                  value: cryptoexchanges.veraciousdata.io
+                - name: ACCESS_KEY
+                  value: AKIASS5NJ6RJAPSWPUT5
+                - name: SECRET_KEY
+                  value: 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
+              volumeMounts:
+                - mountPath: /data/exchange
+                  name: ex-data
+                - mountPath: /data/sentiment
+                  name: sent-data
+          dnsPolicy: None
+          dnsConfig:
+            nameservers:
+              - 192.168.1.80
+              - 192.168.1.1
