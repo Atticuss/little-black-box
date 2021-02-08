@@ -5,8 +5,6 @@ import sys
 
 from botocore.exceptions import ClientError
 
-AWS_CREDENTIAL_LOCATIONS = ["env", "profile"]
-
 
 class CurrentIpRequestException(Exception):
     def __init__(self, message: str, original_exception: Exception):
@@ -162,7 +160,7 @@ if __name__ == "__main__":
             print(f"Public IP has changed. Updating Route53.")
             update_domain(client, args.zone, args.domain, public_ip)
         else:
-            print(f"Route53 record is correct. No update required.")
+            print(f"Route53 record is up to date. No changes required.")
     except CurrentIpRequestException as cire:
         print(f"Could not fetch current IP. {cire.message}")
     except RecordReadException as rre:
