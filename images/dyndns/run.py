@@ -65,7 +65,7 @@ def get_domain_record_ip(client, zone_id: str, target_domain: str):
 
     if target_record is None:
         raise RecordReadException(
-            message=f"target domain ({target_domain}) could not be found within Route53 zone ({zone_id})",
+            message=f"Target domain ({target_domain}) could not be found within Route53 zone ({zone_id})",
             original_exception=None,
         )
 
@@ -166,4 +166,4 @@ if __name__ == "__main__":
     except RecordReadException as rre:
         print(f"Could not fetch A record for domain. {rre.message}")
     except RecordUpdateException as rue:
-        print(f"Could not updated A record for domain. {rue.message}")
+        print(f"Could not update A record for domain. {rue.message}")
