@@ -23,7 +23,7 @@ spec:
             compute: low
           serviceAccountName: default
           automountServiceAccountToken: true
-          restartPolicy: OnFailure
+          restartPolicy: Never
           containers:
             - name: dyndns
               image: atticuss/dyndns:latest
