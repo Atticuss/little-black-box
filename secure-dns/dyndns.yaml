@@ -1,0 +1,37 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: dyndns
+  labels:
+    app: dyndns
+  namespace: secure-dns
+spec:
+  schedule: "*/5 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: dyndns
+          annotations:
+            vault.security.banzaicloud.io/vault-addr: "http://192.168.1.111:8200"
+            vault.security.banzaicloud.io/vault-role: "vault-injector"
+            vault.security.banzaicloud.io/vault-skip-verify: "true"
+            vault.security.banzaicloud.io/vault-path: "kubernetes"
+        spec:
+          serviceAccountName: default
+          automountServiceAccountToken: true
+          restartPolicy: OnFailure
+          containers:
+            - name: dyndns
+              image: atticuss/dyndns:latest
+              imagePullPolicy: Always
+              env:
+                - name: AWS_ACCESS_KEY_ID
+                  value: vault:kv/data/dyndns#ACCESS_KEY
+                - name: AWS_SECRET_ACCESS_KEY
+                  value: vault:kv/data/dyndns#SECRET_KEY
+                - name: ZONE_ID
+                  value: Z04564473TXYVWUJFRVM3
+                - name: DOMAIN
+                  value: dc1.veraciousdata.io
