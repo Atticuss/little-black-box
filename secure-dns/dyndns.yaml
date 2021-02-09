@@ -19,6 +19,8 @@ spec:
             vault.security.banzaicloud.io/vault-skip-verify: "true"
             vault.security.banzaicloud.io/vault-path: "kubernetes"
         spec:
+          nodeSelector:
+            compute: low
           serviceAccountName: default
           automountServiceAccountToken: true
           restartPolicy: OnFailure
@@ -26,6 +28,8 @@ spec:
             - name: dyndns
               image: atticuss/dyndns:latest
               imagePullPolicy: Always
+              # spawn inside a shell so we can read vault-injected secrets
+              command: ["sh", "-c", "python3 /app/run.py -d $DOMAIN -z $ZONE_ID"]
               env:
                 - name: AWS_ACCESS_KEY_ID
                   value: vault:kv/data/dyndns#ACCESS_KEY
