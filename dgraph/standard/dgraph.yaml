@@ -13,6 +13,11 @@ spec:
     metadata:
       labels:
         app: dgraph
+      annotations:
+        vault.security.banzaicloud.io/vault-addr: "http://192.168.1.111:8200"
+        vault.security.banzaicloud.io/vault-role: "vault-injector"
+        vault.security.banzaicloud.io/vault-skip-verify: "true"
+        vault.security.banzaicloud.io/vault-path: "kubernetes"
     spec:
       volumes:
       - name: dgraph-data
@@ -26,6 +31,11 @@ spec:
         ports:
           - containerPort: 5000
             name: auth-http
+        # spawn inside a shell so we can read vault-injected secrets
+        command: ["sh", "-c", "/main"]
+        env:
+          - name: AUTH_SECRET
+            value: vault:kv/data/dgraph#DEV_AUTH_TOKEN
       - name: ratel
         image: dgraph/dgraph:latest
         imagePullPolicy: IfNotPresent
@@ -134,4 +144,4 @@ metadata:
     app: dgraph
 spec:
   forwardAuth:
-    address: http://dgraph.dgraph:5000/auth
+    address: http://dgraph:5000/auth
