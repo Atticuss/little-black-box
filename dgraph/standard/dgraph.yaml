@@ -1,0 +1,137 @@
+# This StatefulSet runs 1 pod with one Zero, one Alpha, & one Ratel containers.
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: dgraph
+spec:
+  serviceName: dgraph
+  replicas: 1
+  selector:
+      matchLabels:
+        app: dgraph
+  template:
+    metadata:
+      labels:
+        app: dgraph
+    spec:
+      volumes:
+      - name: dgraph-data
+        hostPath:
+          path: /mnt/zfs-nas/cluster/dgraph/dev
+          type: Directory
+      containers:
+      - name: auth
+        image: docker.io/atticuss/dgraph-auth:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+          - containerPort: 5000
+            name: auth-http
+      - name: ratel
+        image: dgraph/dgraph:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8000
+          name: http-ratel
+        command:
+          - dgraph-ratel
+      - name: zero
+        image: dgraph/dgraph:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 5080
+          name: grpc-zero
+        - containerPort: 6080
+          name: http-zero
+        volumeMounts:
+        - name: dgraph-data
+          mountPath: /dgraph
+        command:
+          - bash
+          - "-c"
+          - |
+            set -ex
+            dgraph zero --my=$(hostname -f):5080
+      - name: alpha
+        image: dgraph/dgraph:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+          name: http-alpha
+        - containerPort: 9080
+          name: grpc-alpha
+        volumeMounts:
+        - name: dgraph-data
+          mountPath: /dgraph
+        env:
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+        command:
+          - bash
+          - "-c"
+          - |
+            set -ex
+            dgraph alpha --my=$(hostname -f):7080 --zero dgraph-0.dgraph.${POD_NAMESPACE}.svc.cluster.local:5080 --whitelist 10.40.0.0
+      terminationGracePeriodSeconds: 60
+  updateStrategy:
+    type: RollingUpdate
+---
+# This is the service that should be used by the clients of Dgraph to talk to the cluster.
+apiVersion: v1
+kind: Service
+metadata:
+  name: dgraph
+  labels:
+    app: dgraph
+spec:
+  type: ClusterIP
+  ports:
+  - port: 5000
+    targetPort: 5000
+    name: dgraph-auth
+  - port: 5080
+    targetPort: 5080
+    name: grpc-zero
+  - port: 6080
+    targetPort: 6080
+    name: http-zero
+  - port: 8080
+    targetPort: 8080
+    name: http-alpha
+  - port: 9080
+    targetPort: 9080
+    name: grpc-alpha
+  - port: 8000
+    targetPort: 8000
+    name: http-ratel
+  selector:
+    app: dgraph
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: dgraph-ingress
+  labels:
+    app: dgraph
+spec:
+  entryPoints:
+    - dgraph
+  routes:
+  - match: Host(`dev.dgraph.dc1.veraciousdata.io`)
+    kind: Rule
+    services:
+    - name: dgraph
+      port: 9080
+    middlewares:
+      - name: dgraph-auth
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: dgraph-auth
+  labels:
+    app: dgraph
+spec:
+  forwardAuth:
+    address: http://dgraph.dgraph:5000/auth
