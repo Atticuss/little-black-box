@@ -224,7 +224,7 @@ spec:
               containerPort: 8080
             - name: dgraph
               containerPort: 9080
-            - name: sandbox
+            - name: altweb
               containerPort: 8000
 
 ---
@@ -251,5 +251,5 @@ spec:
       targetPort: 9080
     - protocol: TCP
       port: 8000
-      name: sandbox
+      name: altweb
       targetPort: 8000
