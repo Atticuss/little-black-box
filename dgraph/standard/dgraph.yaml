@@ -31,8 +31,7 @@ spec:
         ports:
           - containerPort: 5000
             name: auth-http
-        # spawn inside a shell so we can read vault-injected secrets
-        command: ["sh", "-c", "/main"]
+        command: ["/main"]
         env:
           - name: AUTH_SECRET
             value: vault:kv/data/dgraph#DEV_AUTH_TOKEN
@@ -144,4 +143,4 @@ metadata:
     app: dgraph
 spec:
   forwardAuth:
-    address: http://dgraph:5000/auth
+    address: http://dgraph.dgraph-dev:5000/auth
