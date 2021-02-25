@@ -143,4 +143,6 @@ metadata:
     app: dgraph
 spec:
   forwardAuth:
+    # this assumes we're running in the `dgraph-dev` namespace. will
+    # need update this domain if that ever changes
     address: http://dgraph.dgraph-dev:5000/auth
