@@ -74,7 +74,7 @@ spec:
       containers:
         - name: nord
           image: docker.io/bubuntux/nordvpn:latest
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           # this is required in order for the vault injector to properly
           # load secrets into the env vars
           command: ["sh", "-c", "/usr/bin/start_vpn.sh"]
@@ -107,7 +107,7 @@ spec:
               name: dev-net-tun
         - name: deluge
           image: docker.io/linuxserver/deluge:arm64v8-latest
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           env:
             - name: TZ
               value: "America/New_York"
@@ -130,7 +130,7 @@ spec:
               protocol: TCP
         - name: radarr
           image: docker.io/linuxserver/radarr:arm64v8-latest
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           env:
             - name: TZ
               value: "America/New_York"
@@ -147,7 +147,7 @@ spec:
               protocol: TCP
         - name: sonarr
           image: docker.io/linuxserver/sonarr:arm64v8-latest
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           env:
             - name: TZ
               value: "America/New_York"
@@ -164,7 +164,7 @@ spec:
               protocol: TCP
         - name: jackett
           image: docker.io/linuxserver/jackett:arm64v8-latest
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           env:
             - name: TZ
               value: "America/New_York"
