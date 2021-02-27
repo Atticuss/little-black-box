@@ -165,8 +165,8 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           builder: ${{ steps.buildx.outputs.name }}
-          context: ./images/dgraph-auth
-          file: ./images/dgraph-auth/Dockerfile
+          context: ./images/dgbr
+          file: ./images/dgbr/Dockerfile
           platforms: linux/amd64, linux/arm64, linux/386, linux/arm/v7, linux/arm/v6
           push: true
-          tags: ${{ steps.prep-dgraph-auth.outputs.tags }}
+          tags: ${{ steps.prep-dgraph-backup.outputs.tags }}
