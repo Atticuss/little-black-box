@@ -13,7 +13,14 @@ spec:
         metadata:
           labels:
             app: scrape-backup
+          annotations:
+            vault.security.banzaicloud.io/vault-addr: "http://192.168.1.111:8200"
+            vault.security.banzaicloud.io/vault-role: "vault-injector"
+            vault.security.banzaicloud.io/vault-skip-verify: "true"
+            vault.security.banzaicloud.io/vault-path: "kubernetes"
         spec:
+          serviceAccountName: default
+          automountServiceAccountToken: true
           restartPolicy: OnFailure
           volumes:
             - name: ex-data
@@ -27,7 +34,7 @@ spec:
           containers:
             - name: ex-backup
               image: atticuss/exchange_backup
-              imagePullPolicy: Always
+              imagePullPolicy: IfNotPresent
               tty: True # required to reliably get print() statements from "kubectl logs"
               env:
                 - name: PYTHONUNBUFFERED
@@ -35,9 +42,9 @@ spec:
                 - name: BUCKET_NAME
                   value: cryptoexchanges.veraciousdata.io
                 - name: ACCESS_KEY
-                  value: AKIASS5NJ6RJAPSWPUT5
+                  value: vault:kv/data/aws_backup#ACCESS_KEY
                 - name: SECRET_KEY
-                  value: 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
+                  value: vault:kv/data/aws_backup#SECRET_KEY
               volumeMounts:
                 - mountPath: /data/exchange
                   name: ex-data

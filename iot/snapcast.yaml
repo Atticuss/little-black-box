@@ -30,7 +30,7 @@ spec:
         - name: snapserver
           image: docker.io/atticuss/snapcast-server:aarch64
           command: ["sh", "-c", "/usr/bin/run.sh"]
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           env:
             - name: "SPOT_USERNAME"
               value: vault:kv/data/spotify#USERNAME
@@ -130,7 +130,7 @@ spec:
       containers:
         - name: snapclient
           image: docker.io/atticuss/snapcast-client:aarch64
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           volumeMounts:
             - mountPath: /dev/snd
               name: dev-snd

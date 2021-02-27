@@ -4,6 +4,7 @@ metadata:
   name: scrape
   labels:
     app: scrape
+  namespace: data-harvest
 spec:
   selector:
     matchLabels:
@@ -13,7 +14,14 @@ spec:
     metadata:
       labels:
         app: scrape
+      annotations:
+        vault.security.banzaicloud.io/vault-addr: "http://192.168.1.111:8200"
+        vault.security.banzaicloud.io/vault-role: "vault-injector"
+        vault.security.banzaicloud.io/vault-skip-verify: "true"
+        vault.security.banzaicloud.io/vault-path: "kubernetes"
     spec:
+      serviceAccountName: default
+      automountServiceAccountToken: true
       volumes:
       - name: cb-data
         hostPath:
@@ -26,23 +34,23 @@ spec:
       containers:
       - name: ex-scrape
         image: docker.io/atticuss/exchange_scrape:coinbase
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         tty: True # required to reliably get print() statements from "kubectl logs"
         env:
         - name: PYTHONUNBUFFERED
           value: "0"
         - name: API_PASS
-          value: i89toudsxmo
+          value: vault:kv/data/coinbase#API_PASS
         - name: API_SECRET
-          value: Ml9o0eL/eHJnPXrUqb4WYMUAFQB3+oSqxEqU6nDTeOPPJpM5g55Hg2z1C5feVCr4yNaIT0pmnftCFaI3My390A==
+          value: vault:kv/data/coinbase#API_SECRET
         - name: API_KEY
-          value: ec2fe85c6c2d936e31f4636d94d9e285
+          value: vault:kv/data/coinbase#API_KEY
         volumeMounts:
         - mountPath: /data
           name: cb-data
       - name: sent-scrape
         image: docker.io/atticuss/sentiment_scrape:reddit
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         tty: True # required to reliably get print() statements from "kubectl logs"
         env:
         - name: PYTHONUNBUFFERED

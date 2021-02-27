@@ -27,7 +27,7 @@ spec:
           containers:
             - name: dyndns
               image: atticuss/dyndns:latest
-              imagePullPolicy: Always
+              imagePullPolicy: IfNotPresent
               # spawn inside a shell so we can read vault-injected secrets
               command: ["sh", "-c", "python3 /app/run.py -d $DOMAIN -z $ZONE_ID"]
               env:
@@ -69,7 +69,7 @@ spec:
           containers:
             - name: dyndns
               image: atticuss/dyndns:latest
-              imagePullPolicy: Always
+              imagePullPolicy: IfNotPresent
               # spawn inside a shell so we can read vault-injected secrets
               command: ["sh", "-c", "python3 /app/run.py -d $DOMAIN -z $ZONE_ID"]
               env:
@@ -111,7 +111,7 @@ spec:
           containers:
             - name: dyndns
               image: atticuss/dyndns:latest
-              imagePullPolicy: Always
+              imagePullPolicy: IfNotPresent
               # spawn inside a shell so we can read vault-injected secrets
               command: ["sh", "-c", "python3 /app/run.py -d $DOMAIN -z $ZONE_ID"]
               env:

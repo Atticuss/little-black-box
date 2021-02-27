@@ -41,7 +41,7 @@ spec:
       containers:
         - name: pihole
           image: docker.io/pihole/pihole:latest
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           env:
             - name: TZ
               value: "America/New_York"
