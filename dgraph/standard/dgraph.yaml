@@ -155,6 +155,7 @@ spec:
     services:
     - name: dgraph
       port: 9080
+      scheme: h2c
     middlewares:
       - name: dgraph-auth
 ---
