@@ -5,6 +5,6 @@ ENV GO111MODULE=on \
 
 RUN go get github.com/AugustDev/dgbr
 
-FROM scratch
-
+FROM alpine
+RUN mkdir /etc/cron.d
 COPY --from=builder /go/bin/dgbr /
