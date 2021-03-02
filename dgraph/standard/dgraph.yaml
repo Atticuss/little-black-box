@@ -45,9 +45,9 @@ spec:
         crond -f -l 8"]
         env:
           - name: AWS_ACCESS_KEY
-            value: vault:kv/data/dgraph-dev#ACCESS_KEY
+            value: vault:kv/data/dgraph/dev#ACCESS_KEY
           - name: AWS_SECRET_KEY
-            value: vault:kv/data/dgraph-dev#SECRET_KEY
+            value: vault:kv/data/dgraph/dev#SECRET_KEY
       - name: auth
         image: docker.io/atticuss/dgraph-auth:latest
         imagePullPolicy: IfNotPresent
@@ -57,7 +57,7 @@ spec:
         command: ["/main"]
         env:
           - name: AUTH_SECRET
-            value: vault:kv/data/dgraph#DEV_AUTH_TOKEN
+            value: vault:kv/data/dgraph/dev#AUTH_TOKEN
       - name: ratel
         image: dgraph/dgraph:latest
         imagePullPolicy: IfNotPresent
