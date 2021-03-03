@@ -25,29 +25,6 @@ spec:
           path: /mnt/zfs-nas/cluster/dgraph/dev
           type: Directory
       containers:
-      - name: backup
-        image: atticuss/dgbr:latest
-        imagePullPolicy: IfNotPresent
-        # dgraph alpha servers must whitelist external IPs for performing
-        # exports. as we can't set internal IPs of docker pods at configuration
-        # time, a CronJob k8s resource is out. instead, we dynamically build
-        # out a normal cron within the runtime itself. this allows us to include
-        # dgbr within the same pod as dgraph, enabling access via localhost.
-        # this method also allows us to access vault-injected AWS auth tokens
-        # when configuring the cron. toss an indefinite sleep afterwards so
-        # that the container doesn't exist.
-        command: ["sh", "-c", "echo \"#!/bin/sh\n\n/dgbr backup --AWS_ACCESS_KEY $AWS_ACCESS_KEY --AWS_SECRET_KEY $AWS_SECRET_KEY --region us-east-1 --bucket dgraph-backups-dev --export /exports/\" > /backup.sh && \
-        chmod +x backup.sh && \
-        echo \"0 0 * * * /backup.sh > /proc/1/fd/1 2>/proc/1/fd/2\" > /cron.txt && \
-        touch /var/log/backup.log && \
-        mkdir /exports && \
-        crontab /cron.txt && \
-        crond -f -l 8"]
-        env:
-          - name: AWS_ACCESS_KEY
-            value: vault:kv/data/dgraph/dev#ACCESS_KEY
-          - name: AWS_SECRET_KEY
-            value: vault:kv/data/dgraph/dev#SECRET_KEY
       - name: auth
         image: docker.io/atticuss/dgraph-auth:latest
         imagePullPolicy: IfNotPresent
@@ -104,7 +81,7 @@ spec:
           - "-c"
           - |
             set -ex
-            dgraph alpha --my=$(hostname -f):7080 --zero dgraph-0.dgraph.${POD_NAMESPACE}.svc.cluster.local:5080 --whitelist 10.40.0.0
+            dgraph alpha --my=$(hostname -f):7080 --zero dgraph-0.dgraph.${POD_NAMESPACE}.svc.cluster.local:5080 --whitelist 0.0.0.0/0
       terminationGracePeriodSeconds: 60
   updateStrategy:
     type: RollingUpdate
@@ -156,8 +133,8 @@ spec:
     - name: dgraph
       port: 9080
       scheme: h2c
-    middlewares:
-      - name: dgraph-auth
+    #middlewares:
+    #  - name: dgraph-auth
 ---
 apiVersion: traefik.containo.us/v1alpha1
 kind: Middleware

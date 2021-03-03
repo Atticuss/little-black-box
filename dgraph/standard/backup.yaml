@@ -1,0 +1,42 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: dgraph-backup
+  labels:
+    app: backup
+spec:
+  schedule: "0 7 * * *"
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: backup
+          annotations:
+            vault.security.banzaicloud.io/vault-addr: "http://192.168.1.111:8200"
+            vault.security.banzaicloud.io/vault-role: "vault-injector"
+            vault.security.banzaicloud.io/vault-skip-verify: "true"
+            vault.security.banzaicloud.io/vault-path: "kubernetes"
+        spec:
+          nodeSelector:
+            compute: low
+          serviceAccountName: default
+          automountServiceAccountToken: true
+          restartPolicy: Never
+          containers:
+            - name: backup
+              image: atticuss/dgbr:latest
+              imagePullPolicy: IfNotPresent
+              # spawn inside a shell so we can read vault-injected secrets
+              command: ["sh", "-c", "/dgbr backup --AWS_ACCESS_KEY $AWS_ACCESS_KEY --AWS_SECRET_KEY $AWS_SECRET_KEY --region us-east-1 --bucket $BUCKET --export /exports/ --host dgraph-0.dgraph.${POD_NAMESPACE}.svc.cluster.local --alphaHost dgraph-0.dgraph.${POD_NAMESPACE}.svc.cluster.local --zeroHost dgraph-0.dgraph.${POD_NAMESPACE}.svc.cluster.local"]
+              env:
+                - name: AWS_ACCESS_KEY
+                  value: vault:kv/data/dgraph/dev#ACCESS_KEY
+                - name: AWS_SECRET_KEY
+                  value: vault:kv/data/dgraph/dev#SECRET_KEY
+                - name: BUCKET
+                  value: dgraph-backups-dev
+                - name: POD_NAMESPACE
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.namespace
