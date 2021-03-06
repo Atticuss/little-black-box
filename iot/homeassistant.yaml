@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: homeassistant-deployment
-  namespace: iot
   labels:
     app: homeassistant
 spec:
@@ -16,18 +15,17 @@ spec:
         app: homeassistant
     spec:
       containers:
-      - name: home-assistant
+      - name: homeassistant
         image: docker.io/homeassistant/home-assistant:latest
         ports:
-        - containerPort: 5054
-          name: homeassistant-dns
-          protocol: UDP
+        - containerPort: 8123
+          name: www
+          protocol: TCP
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: homeassistant-service
-  namespace: secure-dns
   labels:
     app: homeassistant
   annotations:
@@ -39,7 +37,7 @@ spec:
   externalTrafficPolicy: Cluster
   loadBalancerIP: 192.168.1.26
   ports:
-  - name: homeassistant-dns
+  - name: ha-www
     protocol: UDP
-    port: 53
-    targetPort: 5054
+    port: 80
+    targetPort: 8123
