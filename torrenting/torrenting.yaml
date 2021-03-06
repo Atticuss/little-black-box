@@ -141,6 +141,8 @@ spec:
               name: radarr-config
             - mountPath: /movies
               name: radarr-movies
+            - mountPath: /downloads/plex
+              name: plex-data
           ports:
             - containerPort: 7878
               name: radarr-http
@@ -158,6 +160,8 @@ spec:
               name: sonarr-config
             - mountPath: /tv
               name: sonarr-tvshows
+            - mountPath: /downloads/plex
+              name: plex-data
           ports:
             - containerPort: 8989
               name: sonarr-http
