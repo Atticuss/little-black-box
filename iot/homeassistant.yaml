@@ -37,8 +37,7 @@ spec:
     app: homeassistant
   type: LoadBalancer
   externalTrafficPolicy: Cluster
-  clusterIP: 10.3.238.235
-  loadBalancerIP: 192.168.1.21
+  loadBalancerIP: 192.168.1.26
   ports:
   - name: homeassistant-dns
     protocol: UDP
