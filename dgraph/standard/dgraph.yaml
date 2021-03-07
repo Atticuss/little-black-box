@@ -133,8 +133,8 @@ spec:
     - name: dgraph
       port: 9080
       scheme: h2c
-    #middlewares:
-    #  - name: dgraph-auth
+    middlewares:
+      - name: dgraph-auth
 ---
 apiVersion: traefik.containo.us/v1alpha1
 kind: Middleware
