@@ -73,6 +73,7 @@ spec:
             type: Directory
       containers:
         - name: nord
+          #image: docker.io/bubuntux/nordvpn:v3.8.10
           image: docker.io/bubuntux/nordvpn:latest
           imagePullPolicy: IfNotPresent
           # this is required in order for the vault injector to properly
@@ -83,8 +84,8 @@ spec:
               add: ["NET_ADMIN"]
           resources:
             limits:
-              cpu: "1000m"
-              memory: "1G"
+              cpu: "2000m"
+              memory: "2G"
           env:
             - name: TZ
               value: "America/New_York"
