@@ -28,7 +28,7 @@ spec:
         arch: aarch64
       containers:
         - name: snapserver
-          image: docker.io/atticuss/snapcast-server:aarch64
+          image: docker.io/atticuss/snapcast-server:latest
           command: ["sh", "-c", "/usr/bin/run.sh"]
           imagePullPolicy: IfNotPresent
           env:
