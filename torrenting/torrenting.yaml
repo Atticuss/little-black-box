@@ -25,7 +25,7 @@ spec:
       serviceAccountName: default
       automountServiceAccountToken: true
       nodeSelector:
-        compute: high
+        compute: low
       volumes:
         - name: dev-net-tun
           hostPath:
@@ -119,7 +119,7 @@ spec:
           #- name: DELUGE_LOGLEVEL
           #  value: "debug"
           volumeMounts:
-            - mountPath: /downloads
+            - mountPath: /downloads/incomplete
               name: deluge-downloads
             - mountPath: /config
               name: deluge-config
