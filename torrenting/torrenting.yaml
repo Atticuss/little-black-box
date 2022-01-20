@@ -80,9 +80,9 @@ spec:
           # load secrets into the env vars
           command: ["sh", "-c", "nord_login && nord_config && nord_connect && nord_watch"]
           securityContext:
-            runAsUser: 0
             capabilities:
-              add: ["NET_ADMIN"]
+              # add: ["NET_ADMIN"]
+              add: ["ALL"]
           resources:
             limits:
               cpu: "2000m"
