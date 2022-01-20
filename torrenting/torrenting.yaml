@@ -116,8 +116,8 @@ spec:
               value: "0"
             - name: PGID
               value: "0"
-          #- name: DELUGE_LOGLEVEL
-          #  value: "debug"
+            - name: DELUGE_LOGLEVEL
+              value: "debug"
           volumeMounts:
             - mountPath: /downloads/incomplete
               name: deluge-downloads
