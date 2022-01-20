@@ -25,7 +25,7 @@ spec:
       serviceAccountName: default
       automountServiceAccountToken: true
       nodeSelector:
-        compute: low
+        compute: high
       volumes:
         - name: dev-net-tun
           hostPath:
