@@ -78,7 +78,7 @@ spec:
           imagePullPolicy: IfNotPresent
           # this is required in order for the vault injector to properly
           # load secrets into the env vars
-          command: ["sh", "-c", "chmod +x /usr/bin/nord_login && /usr/bin/nord_login"]
+          command: ["sh", "-c", "nord_login && nord_config && nord_connect && nord_watch"]
           securityContext:
             capabilities:
               add: ["NET_ADMIN"]
