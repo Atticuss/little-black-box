@@ -73,16 +73,15 @@ spec:
             type: Directory
       containers:
         - name: nord
-          #image: docker.io/bubuntux/nordvpn:v3.8.10
-          image: docker.io/bubuntux/nordvpn:latest
+          image: docker.io/bubuntux/nordvpn:v3.8.10
+          #image: docker.io/bubuntux/nordvpn:latest
           imagePullPolicy: IfNotPresent
           # this is required in order for the vault injector to properly
           # load secrets into the env vars
-          command: ["sh", "-c", "while true; do sleep 10000; done"]
+          command: ["sh", "-c", "/usr/bin/start_vpn.sh"]
           securityContext:
             capabilities:
-              # add: ["NET_ADMIN"]
-              add: ["ALL"]
+              add: ["NET_ADMIN"]
           resources:
             limits:
               cpu: "2000m"
