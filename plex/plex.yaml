@@ -1,3 +1,10 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: plex
+  labels:
+    app: plex
+---
 # consider implementing:
 # https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#examples
 apiVersion: apps/v1

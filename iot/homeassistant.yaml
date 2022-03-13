@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: homeassistant-deployment
+  namespace: iot
   labels:
     app: homeassistant
 spec:
@@ -26,6 +27,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: homeassistant-service
+  namespace: iot
   labels:
     app: homeassistant
   annotations:
