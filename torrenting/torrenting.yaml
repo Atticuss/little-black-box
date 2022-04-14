@@ -80,12 +80,12 @@ spec:
             type: Directory
       containers:
         - name: nord
-          image: docker.io/bubuntux/nordvpn:v3.8.10
+          image: docker.io/bubuntux/nordvpn:v3.12.2
           #image: docker.io/bubuntux/nordvpn:latest
           imagePullPolicy: IfNotPresent
           # this is required in order for the vault injector to properly
           # load secrets into the env vars
-          command: ["sh", "-c", "/usr/bin/start_vpn.sh"]
+          #command: ["sh", "-c", "/usr/bin/start_vpn.sh"]
           securityContext:
             capabilities:
               add: ["NET_ADMIN"]
