@@ -12,3 +12,62 @@ subjects:
   - kind: ServiceAccount
     name: vswh-vault-secrets-webhook
     namespace: vault-injector
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  annotations:
+    meta.helm.sh/release-name: vswh
+    meta.helm.sh/release-namespace: vault-injector
+  creationTimestamp: "2022-04-11T16:58:09Z"
+  labels:
+    app.kubernetes.io/managed-by: Helm
+  managedFields:
+    - apiVersion: rbac.authorization.k8s.io/v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:metadata:
+          f:annotations:
+            .: {}
+            f:meta.helm.sh/release-name: {}
+            f:meta.helm.sh/release-namespace: {}
+          f:labels:
+            .: {}
+            f:app.kubernetes.io/managed-by: {}
+        f:rules: {}
+      manager: helm
+      operation: Update
+      time: "2022-04-11T16:58:09Z"
+  name: vswh-vault-secrets-webhook
+  resourceVersion: "4359023"
+  uid: f0daf5c7-1ae2-4755-8521-021a27c320c9
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - secrets
+      - configmaps
+    verbs:
+      - get
+      - update
+  - apiGroups:
+      - ""
+    resources:
+      - serviceaccounts
+    verbs:
+      - get
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+    verbs:
+      - create
+      - update
+  - apiGroups:
+      - ""
+    resources:
+      - tokenreviews
+    verbs:
+      - get
+      - create
+      - update
