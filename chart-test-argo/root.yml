@@ -6,10 +6,10 @@ metadata:
 spec:
   project: default
   source:
-    #path: chart-test/
-    #repoURL: https://github.com/atticuss/little-black-box.git
-    path: helm-guestbook/
-    repoURL: https://github.com/argoproj/argocd-example-apps.git
+    path: chart-test/
+    repoURL: https://github.com/atticuss/little-black-box.git
+    #path: helm-guestbook/
+    #repoURL: https://github.com/argoproj/argocd-example-apps.git
     targetRevision: HEAD
   destination:
     server: "https://kubernetes.default.svc"
