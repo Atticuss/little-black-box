@@ -7,7 +7,7 @@ spec:
   project: default
   source:
     path: chart-test/
-    repoURL: https://github.com/atticuss/little-black-box
+    repoURL: https://github.com/atticuss/little-black-box.git
     targetRevision: HEAD
   destination:
     server: "https://kubernetes.default.svc"
