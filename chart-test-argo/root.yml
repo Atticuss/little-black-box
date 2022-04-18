@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: sealed-secrets
+  namespace: chart-test
+spec:
+  project: default
+  source:
+    path: chart-test
+    repoURL: https://github.com/atticuss/little-black-box
+    targetRevision: HEAD
+  destination:
+    server: "https://kubernetes.default.svc"
+    namespace: chart-test
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
