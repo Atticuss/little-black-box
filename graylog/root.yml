@@ -44,15 +44,15 @@ spec:
         - name: graylog.replicas
           value: 1
         - name: graylog.input.tcp.service.annotations
-          value:
+          value: >
             metallb.universe.tf/address-pool: external-ip-pool
             metallb.universe.tf/allow-shared-ip: pihole-svc
         - name: graylog.input.udp.service.annotations
-          value:
+          value: >
             metallb.universe.tf/address-pool: external-ip-pool
             metallb.universe.tf/allow-shared-ip: pihole-svc
         - name: graylog.input
-          value:
+          value: >
             tcp:
               service:
                 type: LoadBalancer
