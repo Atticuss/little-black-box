@@ -17,8 +17,8 @@ metadata:
 spec:
   project: default
   source:
-    chart: kong-z/graylog
-    repoURL: https://charts.kong-z.com/
+    chart: kongz/graylog
+    repoURL: https://charts.kong-z.com
     targetRevision: 2.1.1
     helm:
       parameters:
