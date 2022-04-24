@@ -27,6 +27,50 @@ spec:
           value: mongodb-pv
         - name: mongodb.persistence.size
           value: 10Gi
+        - name: mongodb.architecture
+          value: standalone
+        # https://github.com/elastic/helm-charts/blob/main/elasticsearch/README.md#configuration
+        - name: elasticsearch.volumeClaimTemplate.storageClassName
+          value: elasticsearch-pv
+        - name: elasticsearch.volumeClaimTemplate.resources.requests.storage
+          value: 20Gi
+        - name: elasticsearch.replicas
+          value: 1
+        # https://artifacthub.io/packages/helm/kong-z/graylog#configuration
+        - name: graylog.persistence.storageClass
+          value: graylog-pv
+        - name: graylog.persistence.size
+          value: 20Gi
+        - name: graylog.replicas
+          value: 1
+        - name: graylog.input.tcp.service.annotations
+          value:
+            metallb.universe.tf/address-pool: external-ip-pool
+            metallb.universe.tf/allow-shared-ip: pihole-svc
+        - name: graylog.input.udp.service.annotations
+          value:
+            metallb.universe.tf/address-pool: external-ip-pool
+            metallb.universe.tf/allow-shared-ip: pihole-svc
+        - name: graylog.input
+          value:
+            tcp:
+              service:
+                type: LoadBalancer
+                externalTrafficPolicy: Local
+                loadBalancerIP: 192.168.1.27
+              ports:
+                - name: gelf1
+                  port: 12222
+                - name: gelf2
+                  port: 12223
+            udp:
+              service:
+                type: LoadBalancer
+                externalTrafficPolicy: Local
+                loadBalancerIP: 192.168.1.27
+              ports:
+                - name: syslog
+                  port: 5410
   destination:
     server: "https://kubernetes.default.svc"
     namespace: graylog
