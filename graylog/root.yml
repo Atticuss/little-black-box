@@ -1,0 +1,64 @@
+# helm install graylog kongz/graylog --version 2.1.1 --namespace graylog \
+# --set graylog.persistence.storageClass="graylog-pv" \
+# --set graylog.persistence.size="20Gi" \
+# --set graylog.replicas="1" \
+# --set mongodb.global.storageClass="mongodb-pv" \
+# --set mongodb.persistence.size="10Gi" \
+# --set mongodb.architecture="standalone" \
+# --set elasticsearch.volumeClaimTemplate.storageClassName="elasticsearch-pv" \
+# --set elasticsearch.volumeClaimTemplate.resources.requests.storage="20Gi" \
+# --set elasticsearch.replicas="1" \
+# --debug
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: graylog
+  namespace: argocd
+spec:
+  project: default
+  source:
+    chart: kongz/graylog
+    repoURL: https://charts.kong-z.com/
+    targetRevision: 2.1.1
+    helm:
+      parameters:
+        # https://github.com/bitnami/charts/tree/master/bitnami/mongodb/#parameters
+        mongodb.global.storageClass: mongodb-pv
+        mongodb.persistence.size: 10Gi
+        mongodb.architecture: standalone
+        # https://github.com/elastic/helm-charts/blob/main/elasticsearch/README.md#configuration
+        elasticsearch.volumeClaimTemplate.storageClassName: elasticsearch-pv
+        elasticsearch.volumeClaimTemplate.resources.requests.storage: 20Gi
+        elasticsearch.replicas: 1
+        # https://artifacthub.io/packages/helm/kong-z/graylog#configuration
+        graylog.persistence.storageClass: graylog-pv
+        graylog.persistence.size: 20Gi
+        graylog.replicas: 1
+        graylog.input.tcp.service.annotations:
+          metallb.universe.tf/address-pool: external-ip-pool
+          metallb.universe.tf/allow-shared-ip: pihole-svc
+        graylog.input.udp.service.annotations:
+          metallb.universe.tf/address-pool: external-ip-pool
+          metallb.universe.tf/allow-shared-ip: pihole-svc
+        graylog.input:
+          tcp:
+            service:
+              type: LoadBalancer
+              externalTrafficPolicy: Local
+              loadBalancerIP: 192.168.1.27
+            ports:
+              - name: gelf1
+                port: 12222
+              - name: gelf2
+                port: 12223
+          udp:
+            service:
+              type: LoadBalancer
+              externalTrafficPolicy: Local
+              loadBalancerIP: 192.168.1.27
+            ports:
+              - name: syslog
+                port: 5410
+  destination:
+    server: "https://kubernetes.default.svc"
+    namespace: graylog

@@ -1,0 +1,78 @@
+# several pods require PVCs. a storage class would make things easy,
+# but the `local` provisioner doesn't support dynamic PVs. instead
+# i'm just going to manually enum and create all required PVs here.
+# alternatively, could use a signle RWX PV for all PVC, but i'm afraid
+# of weird bugs if the containers begin stepping on each other's toes.
+# also worth noting: current node affinity will graylog lock pods to the
+# poweredge box. probably for the better, but good to keep in mind.
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: graylog-pv
+  namespace: graylog
+spec:
+  capacity:
+    storage: 20Gi
+  volumeMode: Filesystem
+  accessModes:
+  - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: graylog-pv
+  local:
+    path: /mnt/zfs-nas/cluster/graylog
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - zfs-nas
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mongodb-pv
+  namespace: graylog
+spec:
+  capacity:
+    storage: 10Gi
+  volumeMode: Filesystem
+  accessModes:
+  - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: mongodb-pv
+  local:
+    path: /mnt/zfs-nas/cluster/mongodb
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - zfs-nas
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: elasticsearch-pv
+  namespace: graylog
+spec:
+  capacity:
+    storage: 20Gi
+  volumeMode: Filesystem
+  accessModes:
+  - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: elasticsearch-pv
+  local:
+    path: /mnt/zfs-nas/cluster/elasticsearch
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - zfs-nas
