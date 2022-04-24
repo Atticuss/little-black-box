@@ -35,14 +35,14 @@ spec:
         - name: elasticsearch.volumeClaimTemplate.resources.requests.storage
           value: 20Gi
         - name: elasticsearch.replicas
-          value: 1
+          value: "1"
         # https://artifacthub.io/packages/helm/kong-z/graylog#configuration
         - name: graylog.persistence.storageClass
           value: graylog-pv
         - name: graylog.persistence.size
           value: 20Gi
         - name: graylog.replicas
-          value: 1
+          value: "1"
         - name: graylog.input.tcp.service.annotations
           value: >
             metallb.universe.tf/address-pool: external-ip-pool
