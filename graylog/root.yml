@@ -16,10 +16,16 @@ metadata:
   namespace: argocd
 spec:
   project: default
+  destination:
+    server: "https://kubernetes.default.svc"
+    namespace: graylog
   source:
-    chart: graylog
-    repoURL: https://charts.kong-z.com
-    targetRevision: 2.1.1
+    #chart: graylog
+    #repoURL: https://charts.kong-z.com
+    #targetRevision: 2.1.1
+    repoURL: https://github.com/KongZ/charts
+    targetRevision: graylog-4.2
+    path: charts/graylog
     helm:
       parameters:
         # https://github.com/bitnami/charts/tree/master/bitnami/mongodb/#parameters
@@ -71,6 +77,3 @@ spec:
               ports:
                 - name: syslog
                   port: 5410
-  destination:
-    server: "https://kubernetes.default.svc"
-    namespace: graylog
