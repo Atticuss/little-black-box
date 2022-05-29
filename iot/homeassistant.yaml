@@ -15,13 +15,21 @@ spec:
       labels:
         app: homeassistant
     spec:
+      volumes:
+        - name: ha-config
+          hostPath:
+            path: /mnt/zfs-nas/cluster/home-assistant/config
+            type: Directory
       containers:
-      - name: homeassistant
-        image: docker.io/homeassistant/home-assistant:latest
-        ports:
-        - containerPort: 8123
-          name: www
-          protocol: TCP
+        - name: homeassistant
+          image: docker.io/homeassistant/home-assistant:2022.4
+          volumeMounts:
+            - mountPath: /config
+              name: ha-config
+          ports:
+            - containerPort: 8123
+              name: www
+              protocol: TCP
 ---
 apiVersion: v1
 kind: Service
@@ -39,7 +47,7 @@ spec:
   externalTrafficPolicy: Cluster
   loadBalancerIP: 192.168.1.26
   ports:
-  - name: ha-www
-    protocol: TCP
-    port: 80
-    targetPort: 8123
+    - name: ha-www
+      protocol: TCP
+      port: 80
+      targetPort: 8123
