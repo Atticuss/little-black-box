@@ -36,12 +36,12 @@ spec:
         - name: mongodb.architecture
           value: standalone
         # https://github.com/elastic/helm-charts/blob/main/elasticsearch/README.md#configuration
-        #- name: elasticsearch.volumeClaimTemplate.storageClassName
-        #  value: elasticsearch-pv
-        #- name: elasticsearch.volumeClaimTemplate.resources.requests.storage
-        #  value: 20Gi
-        #- name: elasticsearch.replicas
-        #  value: "1"
+        - name: elasticsearch.volumeClaimTemplate.storageClassName
+          value: elasticsearch-pv
+        - name: elasticsearch.volumeClaimTemplate.resources.requests.storage
+          value: 20Gi
+        - name: elasticsearch.replicas
+          value: "1"
         # https://artifacthub.io/packages/helm/kong-z/graylog#configuration
         #- name: graylog.persistence.storageClass
         #  value: graylog-pv
