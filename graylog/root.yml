@@ -22,7 +22,7 @@ spec:
   source:
     chart: graylog
     repoURL: https://charts.kong-z.com
-    targetRevision: 2.1.1
+    targetRevision: 2.1.3
     #repoURL: https://github.com/KongZ/charts
     #targetRevision: graylog-4.2
     #path: charts/graylog
