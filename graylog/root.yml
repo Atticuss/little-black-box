@@ -49,28 +49,34 @@ spec:
           value: 20Gi
         - name: graylog.replicas
           value: "1"
-        - name: graylog.input.tcp.service.annotations
-          value: "metallb.universe.tf/address-pool: external-ip-pool
-            metallb.universe.tf/allow-shared-ip: pihole-svc"
-        - name: graylog.input.udp.service.annotations
-          value: "metallb.universe.tf/address-pool: external-ip-pool
-            metallb.universe.tf/allow-shared-ip: pihole-svc"
+        #- name: graylog.input.tcp.service.annotations
+        #  value: "metallb.universe.tf/address-pool: external-ip-pool
+        #    metallb.universe.tf/allow-shared-ip: graylog-svc"
+        #- name: graylog.input.udp.service.annotations
+        #  value: "metallb.universe.tf/address-pool: external-ip-pool
+        #    metallb.universe.tf/allow-shared-ip: graylog-svc"
         - name: graylog.input
           value: "tcp:
               service:
                 type: LoadBalancer
                 externalTrafficPolicy: Local
                 loadBalancerIP: 192.168.1.27
+                annotations:
+                  metallb.universe.tf/address-pool: external-ip-pool
+                  metallb.universe.tf/allow-shared-ip: pihole-svc
               ports:
                 - name: gelf1
                   port: 12222
                 - name: gelf2
-                  port: 12223"
-        #    udp:
-        #      service:
-        #        type: LoadBalancer
-        #        externalTrafficPolicy: Local
-        #        loadBalancerIP: 192.168.1.27
-        #      ports:
-        #        - name: syslog
-        #          port: 5410"
+                  port: 12223
+            udp:
+              service:
+                type: LoadBalancer
+                externalTrafficPolicy: Local
+                loadBalancerIP: 192.168.1.27
+                annotations:
+                  metallb.universe.tf/address-pool: external-ip-pool
+                  metallb.universe.tf/allow-shared-ip: pihole-svc
+              ports:
+                - name: syslog
+                  port: 5410"
