@@ -24,7 +24,7 @@ spec:
     server: "https://kubernetes.default.svc"
     namespace: loki
   source:
-    chart: grafana/loki-stack
+    chart: loki-stack
     repoURL: https://grafana.github.io/loki/charts
     targetRevision: 2.1.2
     helm:
