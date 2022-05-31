@@ -1,3 +1,7 @@
+# note that this template is currently not working. a yaml parsing
+# error occurs on the `graylog.input` field and i've been unable
+# to resolve it.
+
 # helm install graylog kongz/graylog --version 2.1.1 --namespace graylog \
 # --set graylog.persistence.storageClass="graylog-pv" \
 # --set graylog.persistence.size="20Gi" \
