@@ -26,7 +26,8 @@ spec:
   source:
     chart: loki-stack
     repoURL: https://grafana.github.io/loki/charts
-    targetRevision: 2.1.2
+    # vers ref: https://github.com/grafana/helm-charts/blob/main/charts/loki-stack/Chart.yaml#L3
+    targetRevision: 2.6.4
     helm:
       parameters:
         # https://github.com/bitnami/charts/tree/master/bitnami/mongodb/#parameters
