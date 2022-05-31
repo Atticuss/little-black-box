@@ -30,5 +30,5 @@ spec:
     helm:
       parameters:
         # https://github.com/bitnami/charts/tree/master/bitnami/mongodb/#parameters
-        - name: grafana.enabled=true
-          value: "true"
+        #- name: grafana.enabled=true
+        #  value: "true"
