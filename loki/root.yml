@@ -1,0 +1,34 @@
+# note that this template is currently not working. a yaml parsing
+# error occurs on the `graylog.input` field and i've been unable
+# to resolve it.
+
+# helm install graylog kongz/graylog --version 2.1.1 --namespace graylog \
+# --set graylog.persistence.storageClass="graylog-pv" \
+# --set graylog.persistence.size="20Gi" \
+# --set graylog.replicas="1" \
+# --set mongodb.global.storageClass="mongodb-pv" \
+# --set mongodb.persistence.size="10Gi" \
+# --set mongodb.architecture="standalone" \
+# --set elasticsearch.volumeClaimTemplate.storageClassName="elasticsearch-pv" \
+# --set elasticsearch.volumeClaimTemplate.resources.requests.storage="20Gi" \
+# --set elasticsearch.replicas="1" \
+# --debug
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: loki
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    server: "https://kubernetes.default.svc"
+    namespace: loki
+  source:
+    chart: loki/loki-stack
+    repoURL: https://grafana.github.io/loki/charts
+    targetRevision: 2.1.3
+    helm:
+      parameters:
+        # https://github.com/bitnami/charts/tree/master/bitnami/mongodb/#parameters
+        - name: grafana.enabled=true
+          value: true
