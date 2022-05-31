@@ -31,4 +31,4 @@ spec:
       parameters:
         # https://github.com/bitnami/charts/tree/master/bitnami/mongodb/#parameters
         - name: grafana.enabled=true
-          value: true
+          value: "true"
