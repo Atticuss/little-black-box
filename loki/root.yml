@@ -26,10 +26,14 @@ spec:
   source:
     chart: loki-stack
     repoURL: https://grafana.github.io/loki/charts
-    # vers ref: https://github.com/grafana/helm-charts/blob/main/charts/loki-stack/Chart.yaml#L3
-    targetRevision: 2.6.4
+    # vers ref: helm show all loki-stack --repo https://github.com/grafana/helm-charts
+    targetRevision: 2.6.5
     helm:
       parameters:
         # https://github.com/bitnami/charts/tree/master/bitnami/mongodb/#parameters
-        #- name: grafana.enabled=true
-        #  value: "true"
+        - name: grafana.enabled
+          value: true
+        - name: filebeat.enabled
+          value: true
+        - name: logstash.enabled
+          value: true
