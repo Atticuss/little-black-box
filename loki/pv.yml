@@ -22,7 +22,7 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   storageClassName: local-storage
   local:
-    path: /mnt/zfs-nas/cluster/loki/ingestor
+    path: /mnt/zfs-nas/cluster/loki/ingester
   nodeAffinity:
     required:
       nodeSelectorTerms:
