@@ -41,7 +41,7 @@
 # ripped from here:
 #   https://ishanjainn.medium.com/deploy-grafana-loki-and-promtail-using-argocd-416b2fd4539f
 
-piVersion: argoproj.io/v1alpha1
+apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: loki
