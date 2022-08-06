@@ -166,10 +166,12 @@ spec:
                           logurl: "https://grafana.com/loki"
         ingester:
           persistence:
+            storageClass: local-storage
             enabled: true
             size: 10Gi          
         querier:
           persistence:
+            storageClass: local-storage
             enabled: true
             size: 10Gi
   syncPolicy:
