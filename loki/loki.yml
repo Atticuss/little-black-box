@@ -167,11 +167,11 @@ spec:
         ingester:
           persistence:
             enabled: true
-            size: 1Gi          
+            size: 10Gi          
         querier:
           persistence:
             enabled: true
-            size: 1Gi
+            size: 10Gi
   syncPolicy:
     automated:
       prune: true
