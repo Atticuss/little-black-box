@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: promtail
+  namespace: argocd
+spec:
+  destination:
+    namespace: loki
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: promtail
+    repoURL: https://grafana.github.io/helm-charts
+    targetRevision: 6.2.2 #https://github.com/grafana/helm-charts/tree/main/charts/promtail
+    helm:
+      values: |
+        config:
+          lokiAddress: http://loki-gateway.monitoring/loki/api/v1/push   # FQDN of loki-gateway's push endpoint
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
